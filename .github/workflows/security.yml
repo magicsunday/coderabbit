@@ -1,0 +1,59 @@
+name: Security
+
+# This repository ships YAML and Markdown only, so the PHP/Node gates the other
+# repositories run do not apply. What remains is worth running: the workflow files
+# below are themselves executable configuration, and a malformed one would take the
+# central review configuration offline for every repository inheriting it.
+on:
+    push:
+        branches: [main]
+    pull_request:
+    schedule:
+        - cron: '27 3 * * 1'
+
+permissions:
+    contents: read
+
+jobs:
+    code-scanning:
+        uses: magicsunday/.github/.github/workflows/code-scanning.yml@main
+        permissions:
+            contents: read
+            security-events: write
+
+    zizmor:
+        uses: magicsunday/.github/.github/workflows/zizmor.yml@main
+        permissions:
+            contents: read
+            security-events: write
+
+    scorecard:
+        # Scorecard publishes against the default branch; skip pull-request runs.
+        if: github.event_name != 'pull_request'
+        uses: magicsunday/.github/.github/workflows/scorecard.yml@main
+        permissions:
+            contents: read
+            security-events: write
+            id-token: write
+
+    dependency-review:
+        # The dependency-review action only runs in a pull-request context. The only
+        # dependencies here are the actions the workflows pin, which it does cover.
+        if: github.event_name == 'pull_request'
+        uses: magicsunday/.github/.github/workflows/dependency-review.yml@main
+        permissions:
+            contents: read
+            pull-requests: write
+
+    yamllint:
+        # The load-bearing gate for this repository: .coderabbit.yaml is the payload,
+        # and an unparseable one silently falls back to CodeRabbit's schema defaults
+        # everywhere rather than failing visibly. The shared workflow lints
+        # .github/workflows/ by default, so the payload has to be named explicitly —
+        # without the override this job would pass while the one file that matters
+        # went unchecked.
+        uses: magicsunday/.github/.github/workflows/yamllint.yml@main
+        with:
+            paths: '.coderabbit.yaml .github/workflows/'
+        permissions:
+            contents: read
