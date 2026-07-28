@@ -28,6 +28,19 @@ reviews:
         # review on, and the default 5-commit pause disabled so it never stops.
         auto_incremental_review: true
         auto_pause_after_reviewed_commits: 0
+        # Dependabot pull requests consume review quota that human ones then lack.
+        # Their diff is a manifest bump plus a lockfile, so the correctness, security
+        # and API-contract findings this configuration asks for have nothing to attach
+        # to — while the setting above has each pushed commit reviewed again. The
+        # dependency risk is already carried by the required dependency-review check
+        # and by Dependabot's own advisory data, the same reasoning that leaves
+        # lockfiles to the default ignore below.
+        # Keyed on the AUTHOR rather than on the "dependencies" label, which every
+        # such pull request happens to carry: the label is applied by Dependabot, not
+        # guaranteed by it, and filtering on it would also skip a human's hand-written
+        # bump. Matched exactly and case-sensitively against the username.
+        ignore_usernames:
+            - "dependabot[bot]"
     path_filters:
         # Generated / vendored artefacts carry no review value and drown signal.
         # Lockfiles are left to CodeRabbit's default ignore: dependency changes
