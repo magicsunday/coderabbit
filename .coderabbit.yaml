@@ -28,24 +28,27 @@ reviews:
         # review on, and the default 5-commit pause disabled so it never stops.
         auto_incremental_review: true
         auto_pause_after_reviewed_commits: 0
-        # Dependabot pull requests consume review quota that human ones then lack.
-        # Their diff is a manifest bump plus a lockfile, so the correctness, security
-        # and API-contract findings this configuration asks for have nothing to attach
-        # to — while the setting above has each pushed commit reviewed again. The
-        # dependency risk is already carried by the required dependency-review check
-        # and by Dependabot's own advisory data, the same reasoning that leaves
-        # lockfiles to the default ignore below.
+        # Pull requests of the dependency bots consume review quota that human ones
+        # then lack. Their diff is a manifest bump plus a lockfile, so the
+        # correctness, security and API-contract findings this configuration asks
+        # for have nothing to attach to, while the setting above has each pushed
+        # commit reviewed again. The dependency risk is already carried by the
+        # required dependency-review check and by the advisory data of the bot, the
+        # same reasoning that leaves lockfiles to the default ignore below.
         # Keyed on the AUTHOR rather than on the "dependencies" label, which every
-        # such pull request happens to carry: the label is applied by Dependabot, not
+        # such pull request happens to carry: the label is applied by the bot, not
         # guaranteed by it, and filtering on it would also skip a human's hand-written
-        # bump. Matched exactly and case-sensitively against the username.
+        # bump. Matched exactly and case-sensitively against the username. Renovate
+        # is the bot of the account, the Dependabot entry stays until no repository
+        # of the account runs Dependabot any more.
         ignore_usernames:
+            - "renovate[bot]"
             - "dependabot[bot]"
     path_filters:
         # Generated / vendored artefacts carry no review value and drown signal.
         # Lockfiles are left to CodeRabbit's default ignore: dependency changes
         # are already gated by the required dependency-review CI check and by
-        # Dependabot, so a prose review of a machine-generated lockfile is noise.
+        # the dependency bots, so a prose review of a machine-generated lockfile is noise.
         - "!**/.build/**"
         - "!**/vendor/**"
         - "!**/node_modules/**"
