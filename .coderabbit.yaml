@@ -39,11 +39,9 @@ reviews:
         # such pull request happens to carry: the label is applied by the bot, not
         # guaranteed by it, and filtering on it would also skip a human's hand-written
         # bump. Matched exactly and case-sensitively against the username. Renovate
-        # is the bot of the account, the Dependabot entry stays until no repository
-        # of the account runs Dependabot any more.
+        # is the bot of the account.
         ignore_usernames:
             - "renovate[bot]"
-            - "dependabot[bot]"
     path_filters:
         # Generated / vendored artefacts carry no review value and drown signal.
         # Lockfiles are left to CodeRabbit's default ignore: dependency changes
